@@ -1,0 +1,5 @@
+https://blog.devgenius.io/how-to-transcribe-a-video-with-97-accuracy-using-python-f59bbf71d640
+
+https://medium.com/@nishchayjain2k/how-to-convert-video-mp4-into-text-using-python-script-b7b6c8a92f14
+
+https://www.geeksforgeeks.org/extract-speech-text-from-video-in-python/
