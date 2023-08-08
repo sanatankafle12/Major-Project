@@ -1,16 +1,30 @@
 import nltk
+from nltk.tokenize import sent_tokenize, word_tokenize
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer
-import string
+from nltk.stem import PorterStemmer, WordNetLemmatizer
 
 def preprocess_text(text):
-    text = text.lower()
-    tokens = word_tokenize(text)
-    tokens = [token for token in tokens if token not in string.punctuation]
+    sentences = sent_tokenize(text)
     stop_words = set(stopwords.words('english'))
-    tokens = [token for token in tokens if token not in stop_words]
+    words = []
+    for sentence in sentences:
+        tokens = word_tokenize(sentence)
+        filtered_tokens = [word.lower() for word in tokens if word.lower() not in stop_words and word.isalpha()]
+        words.extend(filtered_tokens)
+
+    # Stemming using PorterStemmer
+    stemmer = PorterStemmer()
+    stemmed_words = [stemmer.stem(word) for word in words]
+
+    # Lemmatization using WordNetLemmatizer
     lemmatizer = WordNetLemmatizer()
-    tokens = [lemmatizer.lemmatize(token) for token in tokens]
-    preprocessed_text = ' '.join(tokens)
-    return preprocessed_text
+    lemmatized_words = [lemmatizer.lemmatize(word) for word in stemmed_words]
+
+    # Get unique words
+    unique_words = set(lemmatized_words)
+
+    return (unique_words, lemmatized_words, sentences)
+
+
+unique_words, words, sentences = preprocess_text("Hello")
+print(unique_words)

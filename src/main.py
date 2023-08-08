@@ -9,5 +9,8 @@ text = st.text_area('Text')
 processed_text = preprocess_text(text)
 
 if st.button('Generate notes and MCQ'):
-    st.write(processed_text)
+    unique_words, words, sentences = preprocess_text(text)
+    st.write("unique_words: ", unique_words)
+    st.write("words: ", words)
+    st.write("sentences: ", sentences)
 
