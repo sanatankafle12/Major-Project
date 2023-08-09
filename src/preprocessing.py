@@ -11,20 +11,11 @@ def preprocess_text(text):
         tokens = word_tokenize(sentence)
         filtered_tokens = [word.lower() for word in tokens if word.lower() not in stop_words and word.isalpha()]
         words.extend(filtered_tokens)
-
-    # Stemming using PorterStemmer
     stemmer = PorterStemmer()
     stemmed_words = [stemmer.stem(word) for word in words]
-
-    # Lemmatization using WordNetLemmatizer
     lemmatizer = WordNetLemmatizer()
     lemmatized_words = [lemmatizer.lemmatize(word) for word in stemmed_words]
-
-    # Get unique words
     unique_words = set(lemmatized_words)
+    return (text, unique_words, lemmatized_words, sentences)
 
-    return (unique_words, lemmatized_words, sentences)
 
-
-unique_words, words, sentences = preprocess_text("Hello")
-print(unique_words)
