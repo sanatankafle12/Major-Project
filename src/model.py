@@ -126,4 +126,47 @@ def semantic_net(text):
     pass
 
 def lstm(text):
-    pass
+    import numpy as np
+    from keras.models import Sequential
+    from keras.layers import LSTM, Dense, Embedding
+    from keras.preprocessing.sequence import pad_sequences
+
+    MAX_SEQUENCE_LENGTH = 100
+    LSTM_UNITS = 128
+    NUM_CLASSES = 2
+
+    VOCAB_SIZE = 10000
+
+    EMBEDDING_DIM = 100
+    NUM_EPOCHS = 10
+
+    # Convert your training, validation, and test sets to sequences of word indices
+    train_sequences = tokenizer.texts_to_sequences(text)
+    val_sequences = tokenizer.texts_to_sequences(val_texts)
+    test_sequences = tokenizer.texts_to_sequences(test_texts)
+
+    # Pad the sequences to have uniform length
+    train_data = pad_sequences(train_sequences, maxlen=MAX_SEQUENCE_LENGTH)
+    val_data = pad_sequences(val_sequences, maxlen=MAX_SEQUENCE_LENGTH)
+    test_data = pad_sequences(test_sequences, maxlen=MAX_SEQUENCE_LENGTH)
+
+    # Convert your target labels to one-hot encoding
+    train_labels = np.eye(NUM_CLASSES)[train_labels]
+    val_labels = np.eye(NUM_CLASSES)[val_labels]
+    test_labels = np.eye(NUM_CLASSES)[test_labels]
+
+    # Build and train the LSTM model
+
+    model = Sequential()
+    model.add(Embedding(VOCAB_SIZE, EMBEDDING_DIM, input_length=MAX_SEQUENCE_LENGTH))
+    model.add(LSTM(LSTM_UNITS))
+    model.add(Dense(NUM_CLASSES, activation='softmax'))
+
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    model.fit(train_data, train_labels, validation_data=(val_data, val_labels), epochs=NUM_EPOCHS, batch_size=64)
+
+    # Evaluate the model on the test set
+
+    loss, accuracy = model.evaluate(test_data, test_labels, batch_size=64)
+    print("Test Loss:", loss)
+    print("Test Accuracy:", accuracy)
