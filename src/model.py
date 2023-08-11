@@ -1,8 +1,22 @@
 import nltk
 import math
+import re
+from collections import deque
+
 
 def Formula_identification(text):
-    pass
+    math_patterns = (r'((y|x)\s*=\s*.+),', r'if\s(.+)', r'({.+)')
+    sentences = text.split('.')
+
+    formulas = []
+    for x in sentences:
+        for pattern in math_patterns:
+            if re.search(pattern, x):
+                formulas.append(re.search(pattern, x).group(1))
+                break
+
+    return(formulas)
+
 
 def n_grams(text):
     words = nltk.word_tokenize(text)
@@ -11,12 +25,9 @@ def n_grams(text):
     return(ngrams)
         
 
-def tfidf(text):
+def tfidf(text, stopWords):
     frequency_matrix = {}
-    sentence = text.split('.')
-    stopWords = ['ever', 'under', 'although', 'eight', 'many', 'toward', 'would', 'thru', 'her', 'thereby', 'in', 'meanwhile', 'per', 'seeming', 'whereupon', 'anywhere', 'empty', 'then', 'there', 'here', 'twelve', 'my', 'nowhere', 'some', 'ourselves', '‘ll', 'itself', 'only', 'seemed', 'these', 'such', 'much', 'less', 'ten', 'hence', 'this', 'as', 'also', 'wherever', 'while', 'done', 'moreover', 'three', 'than', 'becomes', 'of', 'yourself', 'were', 'nothing', 'an', 'nor', 'enough', 'his', '’re', 'does', 'they', 'even', 'behind', 'may', 'take', 'afterwards', 'have', 'for', 'formerly', 'something', 'now', 'put', 'ours', 'eleven', 'none', 'out', 'besides', 'again', 'hers', 'first', 'via', 'anyhow', 'latter', 'its', 'whereby', 'hundred', 'say', 'hereby', 'not', 'with', 'often', 'a', 'before', 'but', 'each', 'becoming', 'full', 'from', 'within', 'both', 'below', 'others', 'show', 'whenever', 'too', 'mostly', 'anyway', 'mine', 'once', 'yourselves', 'hereafter', 'another', 'is', 'serious', 'few', 'together', 'might', 'go', 'n’t', 'into', 'whole', 'keep', 'thereafter', 'to', 'whither', 'how', 'further', 'otherwise', '’ll', 'due', 'fifteen', 'whether', 'sixty', 'always', 'amount', 'without', 'where', 'myself', 'who', 'using', 'by', 'made', 'should', 'what', 'nine', 'must', 'indeed', 'being', 'do', 'almost', 'up', 'hereupon', 'namely', 'however', 'amongst', 'it', 'most', 'off', 'your', 'bottom', 'so', 'him', 'perhaps', "'re", 'two', 'seems', 'regarding', 'various', '‘re', 'became', 'are', 'did', 'be', 'thus', 'move', 'and', 'above', 'ca', 'i', 'across', 'all', 'part', 'throughout', 'used', 'six', 'own', 'towards', "'s", 'quite', 'noone', 'them', 'along', "'ve", 'nevertheless', 'upon', 'someone', 'third', 'whatever', 'because', 'five', 'had', 'thereupon', "'ll", 'therefore', "'m", 'beforehand', 'please', 'any', 'am', '‘d', 'several', 'cannot', 'on', '’d', 'over', '‘m', 'the', 'us', 'onto', '’m', 'make', 'twenty', 'four', 'latterly', 'next', 'other', 'through', 'when', 'whoever', 'against', 'except', 'everywhere', 'you', 'our', 'me', "'d", '’s', 'during', 'that', '‘s', 'whom', 'if', 'more', 'n‘t', 'yet', 'never', 'was', 'just', 'anyone', 'same', 'top', 'can', 'beside', 'we', 'really', 'herein', 'fifty', 'somehow', 'among', 'she', 'could', 'though', 'beyond', 'else', 'well', 'nobody', 'whence', 'neither', 'until', 'last', 'seem', 'after', 'will', 'has', 'see', 'since', 'sometimes', 'wherein', 'anything', 'least', 'down', 'no', 'whereas', 'herself', 'himself', 'whereafter', 'very', 'been', 'doing', 'between', 'alone', 'everyone', 'still', 'those', 'at', 'thence', 'therein', 'already', '’ve', 'one', 'why', 'get', 'rather', 'former', 'side', 'or', 'every', 'forty', 'he', 'around', 'everything', 'their', 'become', 've', 'which', 'name', 're', 'either', "n't", 'back', 'sometime', 'front', 'call', 'elsewhere', 'whose', 'unless', 'themselves', 'give', 'yours', 'about', 'somewhere']
-
-    for sent in sentence:
+    for sent in text:
         freq_table = {}
         words=sent.split()
         for word in words:
@@ -50,7 +61,7 @@ def tfidf(text):
     for sent, f_table in frequency_matrix.items():
         idf_table = {}
         for word in f_table.keys():
-            idf_table[word] = math.log10(len(sentence)/float(words_in_doc[word]))
+            idf_table[word] = math.log10(len(text)/float(words_in_doc[word]))
         idf_matrix[sent] =idf_table
 
     tf_idf_matrix = {}
@@ -80,7 +91,7 @@ def tfidf(text):
     sentence_count = 0
     summary = []
 
-    for sentence in sentence:
+    for sentence in text:
         if sentence[:10] in sentenceValue and sentenceValue[sentence[:10]] >= (threshold):
             summary.append(sentence)
             sentence_count += 1
@@ -118,55 +129,11 @@ def text_rank(text):
     print(len(sorted_sentences))
     for x in range(2):
         summarized.append(sorted_sentences[x][0])
-    summary = '. '.join(summarized)
-    return summary
+    return summarized
 
 
 def semantic_net(text):
     pass
 
 def lstm(text):
-    import numpy as np
-    from keras.models import Sequential
-    from keras.layers import LSTM, Dense, Embedding
-    from keras.preprocessing.sequence import pad_sequences
-
-    MAX_SEQUENCE_LENGTH = 100
-    LSTM_UNITS = 128
-    NUM_CLASSES = 2
-
-    VOCAB_SIZE = 10000
-
-    EMBEDDING_DIM = 100
-    NUM_EPOCHS = 10
-
-    # Convert your training, validation, and test sets to sequences of word indices
-    train_sequences = tokenizer.texts_to_sequences(text)
-    val_sequences = tokenizer.texts_to_sequences(val_texts)
-    test_sequences = tokenizer.texts_to_sequences(test_texts)
-
-    # Pad the sequences to have uniform length
-    train_data = pad_sequences(train_sequences, maxlen=MAX_SEQUENCE_LENGTH)
-    val_data = pad_sequences(val_sequences, maxlen=MAX_SEQUENCE_LENGTH)
-    test_data = pad_sequences(test_sequences, maxlen=MAX_SEQUENCE_LENGTH)
-
-    # Convert your target labels to one-hot encoding
-    train_labels = np.eye(NUM_CLASSES)[train_labels]
-    val_labels = np.eye(NUM_CLASSES)[val_labels]
-    test_labels = np.eye(NUM_CLASSES)[test_labels]
-
-    # Build and train the LSTM model
-
-    model = Sequential()
-    model.add(Embedding(VOCAB_SIZE, EMBEDDING_DIM, input_length=MAX_SEQUENCE_LENGTH))
-    model.add(LSTM(LSTM_UNITS))
-    model.add(Dense(NUM_CLASSES, activation='softmax'))
-
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-    model.fit(train_data, train_labels, validation_data=(val_data, val_labels), epochs=NUM_EPOCHS, batch_size=64)
-
-    # Evaluate the model on the test set
-
-    loss, accuracy = model.evaluate(test_data, test_labels, batch_size=64)
-    print("Test Loss:", loss)
-    print("Test Accuracy:", accuracy)
+    pass
