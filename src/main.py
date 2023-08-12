@@ -1,6 +1,7 @@
 import streamlit as st
 from preprocessing import preprocess_text
 from model import *
+import matplotlib.pyplot as plt
 
 st.title("For Mid-Term")
 text = st.text_area('Text')
@@ -20,12 +21,17 @@ if st.button('Text_rank notes'):
     st.write("Text_rank : ",summary)
 
 if st.button('N-grams'):
-    ngrams = n_grams(text)
-    st.write("N-grams: ",ngrams)
+    text, unique_words, words, sentences = preprocess_text(text)
+    words = ' '.join(words)
+    plot = is_a_relationship(words)
+    st.pyplot(plot)
 
 if st.button('Formulas'):
     formula = Formula_identification(text)
     st.write('Formulas: ',formula)
 
+if st.button('See graphs for textrank and tfidf: '):    
+    plot = evaluate(text,stopWords,sentence)
+    st.pyplot(plot)
 
 
