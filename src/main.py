@@ -30,8 +30,12 @@ if st.button('Formulas'):
     formula = Formula_identification(text)
     st.write('Formulas: ',formula)
 
-if st.button('See graphs for textrank and tfidf: '):    
-    plot = evaluate(text,stopWords,sentence)
+button = st.radio("Select: ",('Bar Plot: ', 'Line Plot: '))
+
+if button == ('Line Plot: '):
+    plot = line(text,stopWords,sentence)
     st.pyplot(plot)
 
-
+if button == ('Bar Plot: '):
+    plot = bar(text,stopWords,sentence)
+    st.pyplot(plot)

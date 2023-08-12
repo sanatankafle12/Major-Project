@@ -159,7 +159,7 @@ def is_a_relationship(text):
     return plt
 
 
-def evaluate(text,stopWords,sentence):
+def line(text,stopWords,sentence):
     rouge = Rouge()
     text, unique_words, words, sentences = preprocess_text(text)
     summary = text_rank(text)
@@ -174,20 +174,42 @@ def evaluate(text,stopWords,sentence):
     text_rank_rouge1 = text_rank_scores['rouge-1']['f']
     text_rank_rouge2 = text_rank_scores['rouge-2']['f']
     text_rank_rougel = text_rank_scores['rouge-l']['f']
-
     tfidf_rouge1 = tfidf_scores['rouge-1']['f']
     tfidf_rouge2 = tfidf_scores['rouge-2']['f']
     tfidf_rougel = tfidf_scores['rouge-l']['f']
-
     plt.plot(metrics, [text_rank_rouge1, text_rank_rouge2, text_rank_rougel], label='TextRank', marker='o')
     plt.plot(metrics, [tfidf_rouge1, tfidf_rouge2, tfidf_rougel], label='TF-IDF', marker='o')
     plt.xlabel('ROUGE Metrics')
     plt.ylabel('F1-Score')
     plt.title('Comparison of ROUGE Scores: TextRank vs. TF-IDF')
     plt.legend()
-
     return plt
 
+
+def bar(text,stopWords,sentence):
+    rouge = Rouge()
+    text, unique_words, words, sentences = preprocess_text(text)
+    summary = text_rank(text)
+    summary_tfidf = tfidf(sentence, stopWords)
+    summary = '. '.join(summary)
+    summary_tfidf = '. '.join(summary_tfidf)
+    scores_text_rank = rouge.get_scores([summary], [text])
+    scores_tfidf = rouge.get_scores([summary_tfidf], [text])
+    metrics = ['rouge-1', 'rouge-2', 'rouge-l']
+    text_rank_scores = scores_text_rank[0]
+    tfidf_scores = scores_tfidf[0]
+    fig, axs = plt.subplots(len(metrics), figsize=(8, 6))
+    for i, metric in enumerate(metrics):
+        scores_text_rank = text_rank_scores[metric]['f']
+        scores_tfidf = tfidf_scores[metric]['f']
+        axs[i].bar(['TextRank', 'TF-IDF'], [scores_text_rank, scores_tfidf])
+        axs[i].set_xlabel('Summarization Method')
+        axs[i].set_ylabel('F1-Score')
+        axs[i].set_title(f'Comparison of {metric} Scores')
+        for j, score in enumerate([scores_text_rank, scores_tfidf]):
+            axs[i].text(j, score, str(round(score, 2)), ha='center', va='bottom')
+    plt.tight_layout()
+    return fig
  
 def part_of_relationship():
     pass
