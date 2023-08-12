@@ -131,32 +131,9 @@ def text_rank(text):
         
     sorted_sentences = sorted(zip(sentences, scores), key=lambda x: x[1], reverse=True)
     summarized = []
-    print(len(sorted_sentences))
     for x in range(int(length)):
         summarized.append(sorted_sentences[x][0])
     return summarized
-
-
-def is_a_relationship(text):
-    semantic_net = nx.Graph()
-    grams = n_grams(text)
-    list_ = ['is', 'is a', 'type', 'kind', 'category', 'class', 'group', 'species', 'example', 'instance', 'form', 'variety', 'model', 'variation', 'subtype', 'subcategory', 'subclass', 'subgroup', 'subspecies', 'subexample', 'subinstance', 'subform']
-    nodes = ()
-    edges = ()
-    for x in grams:
-        for j in x:
-            if j in list_:
-                nodes = nodes + (x[0], x[2], )
-                edges = edges + ([x[0], x[2], {'relationship': 'is a'}], )
-                print(edges)
-    semantic_net.add_nodes_from(nodes)
-    semantic_net.add_edges_from(edges)
-    plt.figure()
-    pos = nx.spring_layout(semantic_net)
-    nx.draw_networkx(semantic_net, pos, with_labels=True, node_color="lightblue", font_size=10, node_size=1000)
-    edge_labels = nx.get_edge_attributes(semantic_net, "relationship")
-    nx.draw_networkx_edge_labels(semantic_net, pos, edge_labels=edge_labels)
-    return plt
 
 
 def line(text,stopWords,sentence):
@@ -210,9 +187,45 @@ def bar(text,stopWords,sentence):
             axs[i].text(j, score, str(round(score, 2)), ha='center', va='bottom')
     plt.tight_layout()
     return fig
+
+
+def is_a_relationship(text):
+    grams = n_grams(text)
+    list_ = ['is', 'is a', 'type', 'kind', 'category', 'class', 'group', 'species', 'example', 'instance', 'form', 'variety', 'model', 'variation', 'subtype', 'subcategory', 'subclass', 'subgroup', 'subspecies', 'subexample', 'subinstance', 'subform']
+    nodes = ()
+    edges = ()
+    for x in grams:
+        for j in x:
+            if j in list_:
+                nodes = nodes + (x[0], x[2], )
+                edges = edges + ([x[0], x[2], {'relationship': 'is a'}], )
+    return(nodes,edges)
  
-def part_of_relationship():
-    pass
+def part_of_relationship(text):
+    grams = n_grams(text)
+    relationship_list = ['part of', 'component of', 'element of', 'member of', 'subpart of', 'subcomponent of', 'subelement of', 'submember of']
+    nodes = ()
+    edges = ()
+    
+    for x in grams:
+        for j in x:
+            if j in relationship_list:
+                nodes = nodes + (x[0], x[2], )
+                edges = edges + ([x[0], x[2], {'relationship': 'part of'}], )
+    return(nodes,edges)
 
 def semantic_net(text):
-    pass
+    nodes_all = []
+    edges_all = []
+    nodes,edges = is_a_relationship(text)
+    nodes_all.append(nodes)
+    edges_all.append(edges)
+    semantic_net = nx.Graph()
+    semantic_net.add_nodes_from(nodes_all)
+    semantic_net.add_edges_from(edges_all)
+    plt.figure()
+    pos = nx.spring_layout(semantic_net)
+    nx.draw_networkx(semantic_net, pos, with_labels=True, node_color="lightblue", font_size=10, node_size=1000)
+    edge_labels = nx.get_edge_attributes(semantic_net, "relationship")
+    nx.draw_networkx_edge_labels(semantic_net, pos, edge_labels=edge_labels)
+    return(plt)

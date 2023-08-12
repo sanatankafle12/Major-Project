@@ -23,7 +23,7 @@ if st.button('Text_rank notes'):
 if st.button('N-grams'):
     text, unique_words, words, sentences = preprocess_text(text)
     words = ' '.join(words)
-    plot = is_a_relationship(words)
+    plot = semantic_net(words)
     st.pyplot(plot)
 
 if st.button('Formulas'):
